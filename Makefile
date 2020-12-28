@@ -1,7 +1,13 @@
 .DEFAULT_GOAL := help
+.PHONY: test
 
-check-scripts: ## test shellcheck.
-	shellcheck *.sh
+all: test shellcheck
+
+test:
+	@./test/*.bats
+
+shellcheck: ## test shellcheck.
+	@shellcheck ./bin/*
 
 help: ## Self-documented Makefile
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
