@@ -1,0 +1,44 @@
+#!/bin/bash
+
+usage() {
+  echo "$1"
+  cat <<_EOF_
+Usage:
+  $(basename "$0") [-f]
+
+Options:
+  -f Specify a remote file.
+_EOF_
+}
+
+function kill_children {
+  pkill -P $$;
+  wait;
+}
+
+function main {
+  trap "kill_children" EXIT
+
+  for host in ${STAIL_HOSTS}
+  do
+    ssh -tt "${host}" "tail -F ${1} | ruby -ne 'puts \"\\e[33m$host\\e[0m: \" + \$_;STDOUT.flush'" &
+  done
+
+  wait
+}
+
+while getopts ":f:h" OPT;
+do
+  case $OPT in
+    h) usage
+      ;;
+    f) main "${OPTARG}"
+      ;;
+    :) usage "[ERROR] No arguments." ;
+       exit 1
+       ;;
+    ?) usage "[ERROR] Undefined options." ;
+       exit 1
+      ;;
+  esac
+done
