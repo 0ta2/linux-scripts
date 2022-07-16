@@ -21,7 +21,7 @@ function main {
 
   for host in ${STAIL_HOSTS}
   do
-    ssh -tt "${host}" "tail -F ${1} | ruby -ne 'puts \"\\e[33m$host\\e[0m: \" + \$_;STDOUT.flush'" &
+    ssh -tt "${host}" "tail -F ${1} | awk -v host=${host} '{print host, \$0, \$NF; fflush()}'" &
   done
 
   wait
